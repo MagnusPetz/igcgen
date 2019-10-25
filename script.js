@@ -55,7 +55,6 @@ function exportFile() {
 	head += "\nHFCIDCOMPETITIONID:" + compid.value();
 	head += "\n" + inp.value();
   head += "\nI033638FXA3940SIU4143ENL";
-	brecord = slice(0, brecord.length - 2);
 	save(concat(head.split("\n"), brecord), name, "igc");
 	// createElement('h2', "File name: " + name);
 }
