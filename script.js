@@ -5,14 +5,13 @@ var mouseCoords = [];
 var lastX = -1;
 var lastY = -1;
 
-var vel, minLatIn, maxLatIn, minLonIn, maxLonIn;
-var vel = 34.0;
+var minLatIn, maxLatIn, minLonIn, maxLonIn;
 var minLat = 2940.0;
 var minLon = 600.0;
 var maxLat = 3018.0;
 var maxLon = 840.0;
 
-var velIn, startAltIn, endAltIn;
+var startAltIn, endAltIn;
 
 var startAlt = 100;
 var endAlt = 200;
@@ -55,8 +54,8 @@ function exportFile() {
 	head += "\nHFCCLCOMPETITIONCLASS:" + compcl.value();
 	head += "\nHFCIDCOMPETITIONID:" + compid.value();
 	head += "\n" + inp.value();
-    head += "\nI033638FXA3940SIU4143ENL";
-	save(concat(head.split("\n"), brecord), name, "igc");
+  head += "\nI033638FXA3940SIU4143ENL";
+	save(concat(head.split("\n"), brecord), name);
 	// createElement('h2', "File name: " + name);
 }
 function setup() {
@@ -107,16 +106,13 @@ function setup() {
 	inp = createElement('textarea', "");
 	inp.size(300, 100);
 	createElement('br', "");
-	createElement("span", "Velocity (m/s): ");
-	velIn = createInput('' + vel);
-	createElement('br', "");
 	createElement("span", "Start Altitude (m): ");
 	startAltIn = createInput('100');
 	createElement('br', "");
 	createElement("span", "End Altitude (m): ");
 	endAltIn = createInput('200');
 	createElement('br', "");
-	createElement("span", "Minimum Latitude (min): ");
+	createElement("span", "Minumum Latitude (min): ");
 	minLatIn = createInput('' + minLat);
 	createElement('br', "");
 	createElement("span", "Maximum Latitude (min): ");
@@ -144,14 +140,13 @@ function reset() {
 }
 
 function updateVals() {
-	vel = parseFloat(velIn.value());
 	minLat = parseFloat(minLatIn.value());
 	maxLat = parseFloat(maxLatIn.value());
 	minLon = parseFloat(minLonIn.value());
 	maxLon = parseFloat(maxLonIn.value());
 	startAlt = parseInt(startAltIn.value());
 	endAlt = parseInt(endAltIn.value());
-    alt = startAlt;
+  alt = startAlt;
 }
 
 var hr = 8;
@@ -170,16 +165,15 @@ function zeroPad(count, str) {
 	return temp.padStart(count, '0');
 }
 function generateBRecord() {
-	var lat = yToLat(height - mouseY);
-	var lon = xToLon(mouseX);
-//	return new BRecord(hr, mn, sec, lat, lon);
 	var record = "B";
 	record += zeroPad(2, hr);
 	record += zeroPad(2, mn);
 	record += zeroPad(2, floor(sec));
+	var lat = yToLat(height - mouseY);
 	record += zeroPad(2, floor(lat / 60));
 	record += zeroPad(5, floor((lat % 60) * 1000));
 	record += "N";
+	var lon = xToLon(mouseX);
 	record += zeroPad(3, floor(lon / 60));
 	record += zeroPad(5, floor((lon % 60) * 1000));
 	record += "E";
@@ -210,15 +204,12 @@ function generateBRecordLast() {
 	record += "001";
 	return record;
 }
-
 function touchMoved() {
 	if (pmouseX == mouseX && pmouseY == mouseY) {
 		return;
 	}
 	if (lastX != -1 && lastY != -1) {
-		var dist = distance(mouseX, mouseY, lastX, lastY);
-		sec += dist / vel;
-		// sec += 2 * sqrt((mouseX - lastX)*(mouseX - lastX) + (mouseY - lastY)*(mouseY - lastY));
+		sec += 2 * sqrt((mouseX - lastX)*(mouseX - lastX) + (mouseY - lastY)*(mouseY - lastY));
 	}
 	while (sec >= 60) {
 		mn ++;
@@ -236,58 +227,4 @@ function touchMoved() {
 	append(brecord, generateBRecord());
 	randAlt();
 	ellipse(mouseX, mouseY, 2, 2);
-}
-
-function toRadians(val) {
-	return (val * PI) / 180;
-}
-
-function distance(lat1, lon1, lat2, lon2) {
-	var R = 6371e3;
-	var φ1 = toRadians(lat1);
-	var φ2 = toRadians(lat2);
-	var Δφ = toRadians(lat2-lat1);
-	var Δλ = toRadians(lon2-lon1);
-
-	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-        Math.cos(φ1) * Math.cos(φ2) *
-        Math.sin(Δλ/2) * Math.sin(Δλ/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-	var d = R * c;
-}
-
-class BRecord {
-  constructor(hr, mn, sec, lat, lon) {
-    this.hr = hr;
-	this.mn = mn;
-	this.sec = sec;
-	this.lat = lat;
-	this.lon = lon;
-  }
-  
-  setAltitude(alt) {
-	this.alt = alt;
-  }
-  
-  generate() {
-	var record = "B";
-	record += zeroPad(2, hr);
-	record += zeroPad(2, mn);
-	record += zeroPad(2, floor(sec));
-	var lat = yToLat(height - mouseY);
-	record += zeroPad(2, floor(lat / 60));
-	record += zeroPad(5, floor((lat % 60) * 1000));
-	record += "N";
-	var lon = xToLon(mouseX);
-	record += zeroPad(3, floor(lon / 60));
-	record += zeroPad(5, floor((lon % 60) * 1000));
-	record += "E";
-	record += "A";
-	record += zeroPad(5, floor(alt));
-	record += zeroPad(5, floor(alt));
-	record += "00209";
-	record += "001";
-	return record;
-  }
 }
