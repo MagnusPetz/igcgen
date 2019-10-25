@@ -15,7 +15,7 @@ var startAltIn, endAltIn;
 
 var startAlt = 100;
 var endAlt = 200;
-var alt = -1;
+var alt = startAlt;
 function randAlt() {
 	if (alt > endAlt) {
 		alt += random(-3, 1);
