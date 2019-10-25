@@ -38,7 +38,7 @@ String.prototype.replaceAll = function(search, replacement) {
 
 function exportFile() {
 	var name = millis() + ".igc";
-	brecord[brecord.length - 1] = generateBRecordLast();
+	// brecord[brecord.length - 1] = generateBRecordLast();
 	var head = "A" + arec.value();
 	head += "\nHFDTEDATE:" + date.value().replaceAll("/", "") + "\nHFDTE" + date.value().replaceAll("/", "");
 	head += "\nHFPLTPILOTINCHARGE:" + pilot.value();
