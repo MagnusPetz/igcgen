@@ -1,4 +1,5 @@
 var brecord = [];
+let bg;
 
 var mouseCoords = [];
 
@@ -60,7 +61,11 @@ function exportFile() {
 }
 function setup() {
 	createCanvas(600, 400);
-	background(240);
+	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
+	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
+	url += '&size=600,400';
+	bg = loadImage(url);
+	background(bg);
 	createElement("span", "A Record: ");
 	arec = createInput("FLA1XA");
 	createElement('br', "");
@@ -133,7 +138,7 @@ function setup() {
 }
 
 function reset() {
-	background(240);
+	background(bg);
 	brecord = [];
   lastX = -1;
   lastY = -1;
@@ -146,7 +151,12 @@ function updateVals() {
 	maxLon = parseFloat(maxLonIn.value());
 	startAlt = parseInt(startAltIn.value());
 	endAlt = parseInt(endAltIn.value());
-  alt = startAlt;
+  	alt = startAlt;
+	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
+	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
+	url += '&size=600,400';
+	bg = loadImage(url);
+	reset();
 }
 
 var hr = 8;
