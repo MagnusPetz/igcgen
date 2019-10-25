@@ -170,6 +170,9 @@ function zeroPad(count, str) {
 	return temp.padStart(count, '0');
 }
 function generateBRecord() {
+	var lat = yToLat(height - mouseY);
+	var lon = xToLon(mouseX);
+//	return new BRecord(hr, mn, sec, lat, lon);
 	var record = "B";
 	record += zeroPad(2, hr);
 	record += zeroPad(2, mn);
