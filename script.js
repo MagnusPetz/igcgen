@@ -54,7 +54,7 @@ function exportFile() {
 	head += "\nHFCCLCOMPETITIONCLASS:" + compcl.value();
 	head += "\nHFCIDCOMPETITIONID:" + compid.value();
 	head += "\n" + inp.value();
-  head += "\nI033638FXA3940SIU4143ENL";
+    head += "\nI033638FXA3940SIU4143ENL";
 	save(concat(head.split("\n"), brecord), name, "igc");
 	// createElement('h2', "File name: " + name);
 }
@@ -227,4 +227,54 @@ function touchMoved() {
 	append(brecord, generateBRecord());
 	randAlt();
 	ellipse(mouseX, mouseY, 2, 2);
+}
+
+function distance(lat1, lon1, lat2, lon2) {
+	var R = 6371e3;
+	var φ1 = toRadians(lat1);
+	var φ2 = toRadians(lat2);
+	var Δφ = toRadians(lat2-lat1);
+	var Δλ = toRadians(lon2-lon1);
+
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+}
+
+class BRecord {
+  constructor(hr, mn, sec, lat, lon) {
+    this.hr = hr;
+	this.mn = mn;
+	this.sec = sec;
+	this.lat = lat;
+	this.lon = lon;
+  }
+  
+  setAltitude(alt) {
+	this.alt = alt;
+  }
+  
+  generate() {
+	var record = "B";
+	record += zeroPad(2, hr);
+	record += zeroPad(2, mn);
+	record += zeroPad(2, floor(sec));
+	var lat = yToLat(height - mouseY);
+	record += zeroPad(2, floor(lat / 60));
+	record += zeroPad(5, floor((lat % 60) * 1000));
+	record += "N";
+	var lon = xToLon(mouseX);
+	record += zeroPad(3, floor(lon / 60));
+	record += zeroPad(5, floor((lon % 60) * 1000));
+	record += "E";
+	record += "A";
+	record += zeroPad(5, floor(alt));
+	record += zeroPad(5, floor(alt));
+	record += "00209";
+	record += "001";
+	return record;
+  }
 }
