@@ -59,12 +59,14 @@ function exportFile() {
 	save(concat(head.split("\n"), brecord), name, "igc");
 	// createElement('h2', "File name: " + name);
 }
-function setup() {
-	createCanvas(600, 400);
+function preload() {
 	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
 	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
 	url += '&size=600,400';
 	bg = loadImage(url);
+}
+function setup() {
+	createCanvas(600, 400);
 	background(bg);
 	createElement("span", "A Record: ");
 	arec = createInput("FLA1XA");
