@@ -1,4 +1,5 @@
 var brecord = [];
+var newRecords = [];
 let bg;
 
 var mouseCoords = [];
@@ -6,7 +7,8 @@ var mouseCoords = [];
 var lastX = -1;
 var lastY = -1;
 
-var minLatIn, maxLatIn, minLonIn, maxLonIn;
+var velIn, minLatIn, maxLatIn, minLonIn, maxLonIn;
+var vel = 34.0;
 var minLat = 2940.0;
 var minLon = 600.0;
 var maxLat = 3018.0;
@@ -16,16 +18,6 @@ var startAltIn, endAltIn;
 
 var startAlt = 100;
 var endAlt = 200;
-var alt = startAlt;
-function randAlt() {
-	if (alt > endAlt) {
-		alt += random(-3, 1);
-	} else if (alt == endAlt) {
-		alt += random(-3, 3);
-	} else {
-		alt += random(-1, 3);
-	}
-}
 
 var button;
 var inp;
@@ -37,9 +29,28 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+var alt;
+function randAlt() {
+	if (alt > endAlt) {
+		alt += random(-3, 1);
+	} else if (alt == endAlt) {
+		alt += random(-3, 3);
+	} else {
+		alt += random(-1, 3);
+	}
+}
+function addAlts() {
+	var am = brecord.length;
+	alt = startAlt;
+	for (var i = 0; i < am; i ++) {
+		randAlt();
+		append(newRecords, brecord[i].generate(alt));
+	}
+}
+
 function exportFile() {
+	addAlts();
 	var name = millis() + ".igc";
-	// brecord[brecord.length - 1] = generateBRecordLast();
 	var head = "A" + arec.value();
 	head += "\nHFDTEDATE:" + date.value().replaceAll("/", "") + "\nHFDTE" + date.value().replaceAll("/", "");
 	head += "\nHFPLTPILOTINCHARGE:" + pilot.value();
@@ -55,15 +66,19 @@ function exportFile() {
 	head += "\nHFCCLCOMPETITIONCLASS:" + compcl.value();
 	head += "\nHFCIDCOMPETITIONID:" + compid.value();
 	head += "\n" + inp.value();
-  head += "\nI033638FXA3940SIU4143ENL";
-	save(concat(head.split("\n"), brecord), name, "igc");
+    head += "\nI033638FXA3940SIU4143ENL";
+	save(concat(head.split("\n"), newRecords), name, "igc");
 	// createElement('h2', "File name: " + name);
 }
-function preload() {
+function reloadImage() {
 	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
 	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
 	url += '&size=600,400';
 	bg = loadImage(url);
+}
+
+function preload() {
+	reloadImage();
 }
 function setup() {
 	createCanvas(600, 400);
@@ -113,6 +128,9 @@ function setup() {
 	inp = createElement('textarea', "");
 	inp.size(300, 100);
 	createElement('br', "");
+	createElement("span", "Speed (m/s): ");
+	velIn = createInput('' + vel);
+	createElement('br', "");
 	createElement("span", "Start Altitude (m): ");
 	startAltIn = createInput('100');
 	createElement('br', "");
@@ -142,8 +160,8 @@ function setup() {
 function reset() {
 	background(bg);
 	brecord = [];
-  lastX = -1;
-  lastY = -1;
+    lastX = -1;
+    lastY = -1;
 }
 
 function updateVals() {
@@ -153,11 +171,9 @@ function updateVals() {
 	maxLon = parseFloat(maxLonIn.value());
 	startAlt = parseInt(startAltIn.value());
 	endAlt = parseInt(endAltIn.value());
-  	alt = startAlt;
-	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
-	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
-	url += '&size=600,400';
-	bg = loadImage(url);
+	vel = parseFloat(velIn.value());
+	alt = startAlt;
+	reloadImage();
 	reset();
 }
 
@@ -177,51 +193,19 @@ function zeroPad(count, str) {
 	return temp.padStart(count, '0');
 }
 function generateBRecord() {
-	var record = "B";
-	record += zeroPad(2, hr);
-	record += zeroPad(2, mn);
-	record += zeroPad(2, floor(sec));
 	var lat = yToLat(height - mouseY);
-	record += zeroPad(2, floor(lat / 60));
-	record += zeroPad(5, floor((lat % 60) * 1000));
-	record += "N";
 	var lon = xToLon(mouseX);
-	record += zeroPad(3, floor(lon / 60));
-	record += zeroPad(5, floor((lon % 60) * 1000));
-	record += "E";
-	record += "A";
-	record += zeroPad(5, floor(alt));
-	record += zeroPad(5, floor(alt));
-	record += "00209";
-	record += "001";
-	return record;
-}
-function generateBRecordLast() {
-	var record = "B";
-	record += zeroPad(2, hr);
-	record += zeroPad(2, mn);
-	record += zeroPad(2, floor(sec));
-	var lat = yToLat(height - mouseY);
-	record += zeroPad(2, floor(lat / 60));
-	record += zeroPad(5, floor((lat % 60) * 1000));
-	record += "N";
-	var lon = xToLon(mouseX);
-	record += zeroPad(3, floor(lon / 60));
-	record += zeroPad(5, floor((lon % 60) * 1000));
-	record += "E";
-	record += "A";
-	record += zeroPad(5, floor(endAlt));
-	record += zeroPad(5, floor(endAlt));
-	record += "00209";
-	record += "001";
-	return record;
+	return new BRecord(hr, mn, sec, lat, lon);
 }
 function touchMoved() {
 	if (pmouseX == mouseX && pmouseY == mouseY) {
 		return;
 	}
 	if (lastX != -1 && lastY != -1) {
-		sec += 2 * sqrt((mouseX - lastX)*(mouseX - lastX) + (mouseY - lastY)*(mouseY - lastY));
+		var dist = distance(xToLon(mouseX) / 60, yToLat(mouseY) / 60, xToLon(lastX) / 60, yToLat(lastY) / 60);
+		console.log("Distance: " + dist)
+		sec += dist / vel;
+		// sec += 2 * sqrt((mouseX - lastX)*(mouseX - lastX) + (mouseY - lastY)*(mouseY - lastY));
 	}
 	while (sec >= 60) {
 		mn ++;
@@ -239,4 +223,54 @@ function touchMoved() {
 	append(brecord, generateBRecord());
 	randAlt();
 	ellipse(mouseX, mouseY, 2, 2);
+}
+
+function toRadians(val) {
+	return (val * PI) / 180;
+}
+
+function distance(lat1, lon1, lat2, lon2) {
+	var R = 6371e3; // Radius of Earth in meters
+	var φ1 = toRadians(lat1);
+	var φ2 = toRadians(lat2);
+	var Δφ = toRadians(lat2-lat1);
+	var Δλ = toRadians(lon2-lon1);
+
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+	var d = R * c;
+	return d;
+}
+
+class BRecord {
+	constructor(hr, mn, sec, lat, lon) {
+		this.hr = hr;
+		this.mn = mn;
+		this.sec = floor(sec);
+		this.lat = lat;
+		this.lon = lon;
+	}
+ 
+  
+	generate(altitude) {
+		var record = "B";
+		record += zeroPad(2, this.hr);
+		record += zeroPad(2, this.mn);
+		record += zeroPad(2, this.sec);
+		record += zeroPad(2, floor(this.lat / 60));
+		record += zeroPad(5, floor((this.lat % 60) * 1000));
+		record += "N";
+		record += zeroPad(3, floor(this.lon / 60));
+		record += zeroPad(5, floor((this.lon % 60) * 1000));
+		record += "E";
+		record += "A";
+		record += zeroPad(5, floor(altitude));
+		record += zeroPad(5, floor(altitude));
+		record += "00209";
+		record += "001";
+		return record;
+	}
 }
