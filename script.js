@@ -70,7 +70,6 @@ function exportFile() {
 	save(concat(head.split("\n"), newRecords), name, "igc");
 	// createElement('h2', "File name: " + name);
 }
-
 function reloadImage() {
 	var url = 'http://www.mapquestapi.com/staticmap/v4/getmap?key=tcbpe1y9C0QUodK3yC4eVoua1saEFKQe';
 	url += '&bestfit=' + (minLat / 60) + ',' + (minLon / 60) + ',' + (maxLat / 60) + ',' + (maxLon / 60);
