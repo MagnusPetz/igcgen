@@ -198,6 +198,7 @@ function generateBRecord() {
 	return new BRecord(hr, mn, sec, lat, lon);
 }
 function touchMoved() {
+	var before = sec;
 	if (pmouseX == mouseX && pmouseY == mouseY) {
 		return;
 	}
@@ -205,6 +206,9 @@ function touchMoved() {
 		var dist = distance(xToLon(mouseX) / 60, yToLat(mouseY) / 60, xToLon(lastX) / 60, yToLat(lastY) / 60);
 		console.log("Distance: " + dist)
 		sec += dist / vel;
+		if (floor(sec) == floor(before)) {
+			return;
+		}
 		// sec += 2 * sqrt((mouseX - lastX)*(mouseX - lastX) + (mouseY - lastY)*(mouseY - lastY));
 	}
 	while (sec >= 60) {
